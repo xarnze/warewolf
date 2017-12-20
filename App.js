@@ -67,7 +67,7 @@ export class People extends React.Component {
       <View style={styles.outerContaner}>
         <Header
           centerComponent={{ text: 'People', style: { color: '#fff' } }}
-          rightComponent={{ icon: 'home', color: '#fff', onPress: () => navigate('AddPerson') }}
+          rightComponent={{ icon: 'add-user', color: '#fff', onPress: () => navigate('AddPerson') }}
         />
           <SortableListView
             style={{ flex: 1, width: '100%' }}
