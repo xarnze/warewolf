@@ -4,6 +4,7 @@ import { Header, Button, FormLabel, FormInput } from 'react-native-elements';
 import {
   DrawerNavigator,
 } from 'react-navigation';
+import { Game } from './Game';
 
 let AppData = {
   Players: [
@@ -11,12 +12,36 @@ let AppData = {
     {name: 'Aaron'},
   ],
   Characters: [
-    {name: 'Wolf'},
-    {name: 'Villager'},
-    {name: 'Hunter'},
-    {name: 'Witch'},
-    {name: 'Seer'},
-    {name: 'Doctor'},
+    {
+      id: 0,
+      name: 'Wolf',
+      enabled: true
+    },
+    {
+      id: 1,
+      name: 'Villager',
+      enabled: true
+    },
+    {
+      id: 2,
+      name: 'Hunter',
+      enabled: true
+    },
+    {
+      id: 3,
+      name: 'Witch',
+      enabled: true
+    },
+    {
+      id: 4,
+      name: 'Seer',
+      enabled: true
+    },
+    {
+      id: 5,
+      name: 'Doctor',
+      enabled: true
+    },
   ],
   Game: {
     ActiveCharacters: [],
@@ -69,6 +94,7 @@ class RowComponent extends React.Component {
 
 class CharacterRowComponent extends React.Component {
   render() {
+    let data = this.props.data;
     return (
       <TouchableHighlight
         underlayColor={'#eee'}
@@ -82,7 +108,7 @@ class CharacterRowComponent extends React.Component {
       >
         <View>
           <Text>{this.props.data.name}</Text>
-          <Switch />
+          <Switch value={AppData.Characters[data.id].enabled} onValueChange={ (val) => { AppData.Characters[data.id].enabled = val; this.forceUpdate();}}/>
         </View>
       </TouchableHighlight>
     )
@@ -165,7 +191,7 @@ export class PickCharacters extends React.Component {
     );
   }
   selectCharacters(navigation) {
-    console.log(AppData);
+    navigation('Game', { appdata: AppData, navigate: navigation })
   }
 }
 
@@ -173,7 +199,8 @@ export default App = DrawerNavigator({
   Home: { screen: MainMenu },
   People: { screen: People },
   PickCharacters: { screen: PickCharacters },
-  AddPerson: { screen: AddPerson }
+  AddPerson: { screen: AddPerson },
+  Game: { screen: Game }
 });
 
 const styles = StyleSheet.create({
