@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableHighlight } from 'react-native';
+import { StyleSheet, Text, View, TouchableHighlight, Switch } from 'react-native';
 import { Header, Button, FormLabel, FormInput } from 'react-native-elements';
 import {
   DrawerNavigator,
@@ -10,7 +10,14 @@ let AppData = {
     {name: 'Sophie'},
     {name: 'Aaron'},
   ],
-  Characters: [],
+  Characters: [
+    {name: 'Wolf'},
+    {name: 'Villager'},
+    {name: 'Hunter'},
+    {name: 'Witch'},
+    {name: 'Seer'},
+    {name: 'Doctor'},
+  ],
   Game: {
     ActiveCharacters: [],
     WolfTeam: [],
@@ -60,6 +67,28 @@ class RowComponent extends React.Component {
   }
 }
 
+class CharacterRowComponent extends React.Component {
+  render() {
+    return (
+      <TouchableHighlight
+        underlayColor={'#eee'}
+        style={{
+          padding: 25,
+          backgroundColor: '#F8F8F8',
+          borderBottomWidth: 1,
+          borderColor: '#eee',
+        }}
+        {...this.props.sortHandlers}
+      >
+        <View>
+          <Text>{this.props.data.name}</Text>
+          <Switch />
+        </View>
+      </TouchableHighlight>
+    )
+  }
+}
+
 export class People extends React.Component {
   render() {
     const { navigate } = this.props.navigation;
@@ -67,7 +96,7 @@ export class People extends React.Component {
       <View style={styles.outerContaner}>
         <Header
           centerComponent={{ text: 'People', style: { color: '#fff' } }}
-          rightComponent={{ icon: 'add-user', color: '#fff', onPress: () => navigate('AddPerson') }}
+          rightComponent={{ icon: 'add', color: '#fff', onPress: () => navigate('AddPerson') }}
         />
           <SortableListView
             style={{ flex: 1, width: '100%' }}
@@ -121,12 +150,13 @@ export class PickCharacters extends React.Component {
         />
           <SortableListView
             style={{ flex: 1, width: '100%' }}
-            data={AppData.Players}
+            disableSorting={true}
+            data={AppData.Characters}
             onRowMoved={e => {
-              AppData.Players.splice(e.to, 0, AppData.Players.splice(e.from, 1)[0])
+              AppData.Characters.splice(e.to, 0, AppData.Characters.splice(e.from, 1)[0])
               this.forceUpdate()
             }}
-            renderRow={row => <RowComponent data={row} />}
+            renderRow={row => <CharacterRowComponent data={row} />}
           />
           <Button
             title='Next'
