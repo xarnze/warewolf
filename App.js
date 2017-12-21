@@ -8,45 +8,67 @@ import { Game } from './Game';
 
 let AppData = {
   Players: [
-    {name: 'Sophie'},
-    {name: 'Aaron'},
+    {
+      name: 'Sophie',
+      characterId: 0
+    },
+    {
+      name: 'Aaron',
+      characterId: 1
+    },
   ],
   Characters: [
     {
       id: 0,
       name: 'Wolf',
-      enabled: true
+      enabled: true,
+      description: 'The werewolf 🐺',
+      helpText: 'Choose a player to kill tonight:'
     },
     {
       id: 1,
       name: 'Villager',
-      enabled: true
+      enabled: true,
+      description: 'A normal villager',
+      helpText: ''
     },
     {
       id: 2,
       name: 'Hunter',
-      enabled: true
+      enabled: true,
+      description: '',
+      helpText: ''
     },
     {
       id: 3,
       name: 'Witch',
-      enabled: true
+      enabled: true,
+      description: '',
+      helpText: ''
     },
     {
       id: 4,
       name: 'Seer',
-      enabled: true
+      enabled: true,
+      description: '',
+      helpText: ''
     },
     {
       id: 5,
       name: 'Doctor',
-      enabled: true
+      enabled: true,
+      description: '',
+      helpText: ''
     },
   ],
   Game: {
+    CurrentDay: 1,
+    ActivePlayer: 0,
+    CurrentScreenComponent: null,
     ActiveCharacters: [],
     WolfTeam: [],
     VillagerTeam: [],
+    LivePlayers: []
   }
 }
 
@@ -191,7 +213,15 @@ export class PickCharacters extends React.Component {
     );
   }
   selectCharacters(navigation) {
-    navigation('Game', { appdata: AppData, navigate: navigation })
+    let self = this;
+    AppData.Game.LivePlayers = JSON.parse(JSON.stringify(AppData.Players));
+    navigation('Game', { appdata: (inObj) => { return self.getAppData(inObj, self) }, navigate: navigation })
+  }
+  getAppData(inObj, self){
+    if(inObj){
+      AppData = inObj;
+    }
+    return AppData;
   }
 }
 

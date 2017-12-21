@@ -8,11 +8,17 @@ import { Welcome } from './GameScreens/Welcome';
 
 export class Game extends React.Component {
   render() {
-    const navigate = this.props.navigate;
-    const AppData = this.props.appdata;
+    console.log(this.props)
+    const navigate = this.props.navigation.state.params.navigate;
+    const AppData = this.props.navigation.state.params.appdata();
+    let self = this;
+    const AppDataFunc = (inObj) => {const newAppData = this.props.navigation.state.params.appdata(inObj); if(inObj) {self.forceUpdate();} return newAppData;};
+    if(AppData.Game.CurrentScreenComponent === null){
+      AppData.Game.CurrentScreenComponent = Welcome;
+    }
     return (
       <View style={styles.container}>
-        <Welcome />
+        <AppData.Game.CurrentScreenComponent data={ AppDataFunc }/>
       </View>
     );
   }

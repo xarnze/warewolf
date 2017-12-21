@@ -4,15 +4,22 @@ import { Header, Button, FormLabel, FormInput } from 'react-native-elements';
 import {
   DrawerNavigator,
 } from 'react-navigation';
+import { Night } from './Night';
 
 export class Welcome extends React.Component {
   render() {
+    const dataFunc = this.props.data;
+    const AppData = dataFunc();
     return (
       <View style={styles.container}>
-        <Text> PlayerName is the Game master.</Text>
+        <Text> {AppData.Players[0].name} is the Game master.</Text>
         <Text>All players should sit is a circle so that the phone may be easily passed around. The game master will read the instructions at the start and end of each day.</Text>
         <Button
-          title='Go to sleep 😴'/>
+          title='Go to sleep 😴' onPress={ () => {
+            let appData = dataFunc();
+            appData.Game.CurrentScreenComponent = Night
+            dataFunc(appData)
+          }} />
       </View>
     );
   }
