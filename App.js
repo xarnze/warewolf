@@ -6,6 +6,9 @@ import {
 } from 'react-navigation';
 import { Game } from './Game';
 
+const WOLF = 0;
+const VILLAGE = 1;
+
 let AppData = {
   Players: [
     {
@@ -22,6 +25,8 @@ let AppData = {
       id: 0,
       name: 'Wolf',
       enabled: true,
+      min: 1,
+      team: WOLF,
       description: 'The werewolf 🐺',
       helpText: 'Choose a player to kill tonight:'
     },
@@ -29,6 +34,8 @@ let AppData = {
       id: 1,
       name: 'Villager',
       enabled: true,
+      min: 0,
+      team: VILLAGE,
       description: 'A normal villager',
       helpText: ''
     },
@@ -36,6 +43,8 @@ let AppData = {
       id: 2,
       name: 'Hunter',
       enabled: true,
+      min: 0,
+      team: VILLAGE,
       description: '',
       helpText: ''
     },
@@ -43,6 +52,8 @@ let AppData = {
       id: 3,
       name: 'Witch',
       enabled: true,
+      min: 0,
+      team: VILLAGE,
       description: '',
       helpText: ''
     },
@@ -50,6 +61,8 @@ let AppData = {
       id: 4,
       name: 'Seer',
       enabled: true,
+      min: 0,
+      team: VILLAGE,
       description: '',
       helpText: ''
     },
@@ -57,8 +70,19 @@ let AppData = {
       id: 5,
       name: 'Doctor',
       enabled: true,
+      min: 0,
+      team: VILLAGE,
       description: '',
       helpText: ''
+    },
+    {
+      id: 6,
+      name: 'Alpha Wolf',
+      enabled: true,
+      min: 1,
+      team: WOLF,
+      description: 'The Alpha werewolf 🐺, You must say the word warewolf during the day.',
+      helpText: 'Choose a player to kill tonight:'
     },
   ],
   Game: {
@@ -130,6 +154,7 @@ class CharacterRowComponent extends React.Component {
       >
         <View>
           <Text>{this.props.data.name}</Text>
+          <Text>{this.props.data.description}</Text>
           <Switch value={AppData.Characters[data.id].enabled} onValueChange={ (val) => { AppData.Characters[data.id].enabled = val; this.forceUpdate();}}/>
         </View>
       </TouchableHighlight>
@@ -214,14 +239,53 @@ export class PickCharacters extends React.Component {
   }
   selectCharacters(navigation) {
     let self = this;
-    AppData.Game.LivePlayers = JSON.parse(JSON.stringify(AppData.Players));
+    this.assignRoles();
     navigation('Game', { appdata: (inObj) => { return self.getAppData(inObj, self) }, navigate: navigation })
+  }
+  assignRoles() {
+    AppData.Game.LivePlayers = JSON.parse(JSON.stringify(AppData.Players));
+    let countTeamWolf = 0;
+    let countTeamVillage = 0;
+    let lastRandomCharacterId = -1;
+    const totalPlayers = AppData.Game.LivePlayers.length;
+    const maxWolves = totalPlayers/2;
+    const minWolves = this.getMinWolves();
+    for (var i = 0; i < AppData.Game.LivePlayers.length; i++) {
+      let randomCharacterID = -1;
+      do {
+        randomCharacterID = this.getRandomInt(-1, AppData.Characters.length);
+      }while(randomCharacterID == lastRandomCharacterId || (AppData.Characters[randomCharacterID].team === WOLF && countTeamWolf >= maxWolves) || !AppData.Characters[randomCharacterID].enabled)
+      lastRandomCharacterId = randomCharacterID;
+      if(AppData.Characters[randomCharacterID].team === WOLF){
+        countTeamWolf++;
+      }else{
+        countTeamVillage++;
+      }
+      AppData.Game.LivePlayers[i].characterId = randomCharacterID;
+    }
+    if(countTeamWolf < minWolves){
+      this.assignRoles();
+    }
+  }
+  getMinWolves(){
+    let minWolves = 0;
+    for (var i = 0; i < AppData.Characters.length; i++) {
+      if(AppData.Characters[i].team === WOLF && AppData.Characters[i].enabled){
+        minWolves += AppData.Characters[i].min;
+      }
+    }
+    return minWolves;
   }
   getAppData(inObj, self){
     if(inObj){
       AppData = inObj;
     }
     return AppData;
+  }
+  getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
   }
 }
 
