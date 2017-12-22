@@ -25,6 +25,7 @@ let AppData = {
       id: 0,
       name: 'Wolf',
       enabled: true,
+      kills: true,
       min: 1,
       team: WOLF,
       description: 'The werewolf 🐺',
@@ -34,6 +35,7 @@ let AppData = {
       id: 1,
       name: 'Villager',
       enabled: true,
+      kills: false,
       min: 0,
       team: VILLAGE,
       description: 'A normal villager',
@@ -43,6 +45,7 @@ let AppData = {
       id: 2,
       name: 'Hunter',
       enabled: true,
+      kills: false,
       min: 0,
       team: VILLAGE,
       description: '',
@@ -52,15 +55,30 @@ let AppData = {
       id: 3,
       name: 'Witch',
       enabled: true,
+      kills: false,
       min: 0,
       team: VILLAGE,
       description: '',
-      helpText: ''
+      helpText: '',
+      power: [
+        {
+          name: 'Life potion',
+          uses: 1,
+          type: 'revive'
+        },
+        {
+          name: 'Death potion',
+          uses: 1,
+          type: 'kill'
+        },
+      ]
     },
     {
       id: 4,
       name: 'Seer',
       enabled: true,
+      kills: false,
+      reveals: true,
       min: 0,
       team: VILLAGE,
       description: '',
@@ -70,6 +88,8 @@ let AppData = {
       id: 5,
       name: 'Doctor',
       enabled: true,
+      kills: false,
+      heals: true,
       min: 0,
       team: VILLAGE,
       description: '',
@@ -79,9 +99,10 @@ let AppData = {
       id: 6,
       name: 'Alpha Wolf',
       enabled: true,
+      kills: true,
       min: 1,
       team: WOLF,
-      description: 'The Alpha werewolf 🐺, You must say the word warewolf during the day.',
+      description: 'The Alpha werewolf 🐺, You must say the word werewolf during the day.',
       helpText: 'Choose a player to kill tonight:'
     },
   ],
@@ -253,8 +274,8 @@ export class PickCharacters extends React.Component {
     for (var i = 0; i < AppData.Game.LivePlayers.length; i++) {
       let randomCharacterID = -1;
       do {
-        randomCharacterID = this.getRandomInt(-1, AppData.Characters.length);
-      }while(randomCharacterID == lastRandomCharacterId || (AppData.Characters[randomCharacterID].team === WOLF && countTeamWolf >= maxWolves) || !AppData.Characters[randomCharacterID].enabled)
+        randomCharacterID = this.getRandomInt(0, AppData.Characters.length);
+      }while(randomCharacterID == lastRandomCharacterId || (AppData.Characters[randomCharacterID].team === WOLF && countTeamWolf >= maxWolves) || (!AppData.Characters[randomCharacterID].enabled))
       lastRandomCharacterId = randomCharacterID;
       if(AppData.Characters[randomCharacterID].team === WOLF){
         countTeamWolf++;
@@ -263,8 +284,16 @@ export class PickCharacters extends React.Component {
       }
       AppData.Game.LivePlayers[i].characterId = randomCharacterID;
     }
-    if(countTeamWolf < minWolves){
-      this.assignRoles();
+    while(countTeamWolf < minWolves){
+      AppData.Game.LivePlayers[this.getRandomInt(0, AppData.Game.LivePlayers.length)].characterId = this.getEnabledWolf();
+      countTeamWolf++;
+    }
+  }
+  getEnabledWolf(){
+    for (var i = 0; i < AppData.Characters.length; i++) {
+      if(AppData.Characters[i].team === WOLF && AppData.Characters[i].enabled){
+        return AppData.Characters[i].id;
+      }
     }
   }
   getMinWolves(){
