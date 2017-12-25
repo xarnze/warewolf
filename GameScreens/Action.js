@@ -81,6 +81,11 @@ export class Action extends React.Component {
     })
     dataFunc(appData)
   }
+  markPlayerForDeath(player, dataFunc){
+    let appData = dataFunc();
+    appData.Game.toDie.push(player.name);
+    dataFunc(appData)
+  }
   markPlayerForWolfAttack(player, dataFunc) {
     let appData = dataFunc();
     let Vote = appData.Game.WolfVotes[player.name] || {
@@ -112,7 +117,7 @@ export class Action extends React.Component {
     if(AppData.Characters[AppData.Game.LivePlayers[AppData.Game.ActivePlayer].characterId].kills && !AppData.Characters[AppData.Game.LivePlayers[AppData.Game.ActivePlayer].characterId].killsInstant){
       this.markPlayerForWolfAttack(getPlayerByName(this.state.item, AppData.Characters[AppData.Game.LivePlayers), dataFunc);
     }else if(AppData.Characters[AppData.Game.LivePlayers[AppData.Game.ActivePlayer].characterId].killsInstant){
-      this.killPlayer(getPlayerIdxByName(this.state.item, AppData.Characters[AppData.Game.LivePlayers), dataFunc);
+      this.markPlayerForDeath(getPlayerByName(this.state.item, AppData.Characters[AppData.Game.LivePlayers), dataFunc);
     }
     if(appData.Game.ActivePlayer+1 < appData.Game.LivePlayers.length){
       appData.Game.ActivePlayer++;
@@ -121,6 +126,10 @@ export class Action extends React.Component {
     }else{
       appData.Game.ActivePlayer = 0;
       getKilledByWolf(dataFunc);
+      for (var i = 0; i < appData.Game.toDie.length; i++) {
+        const player = appData.Game.toDie[i];
+        this.killPlayer(getPlayerIdxByName(player.name, AppData.Characters[AppData.Game.LivePlayers), dataFunc);
+      }
       appData.Game.CurrentScreenComponent = Outcome;
     }
     dataFunc(appData)

@@ -114,7 +114,8 @@ let AppData = {
     WolfTeam: [],
     VillagerTeam: [],
     LivePlayers: [],
-    WolfVotes: {},
+    WolfVotes: {}
+    toDie: [],
     KilledLastRound: []
   }
 }
