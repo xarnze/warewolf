@@ -113,7 +113,9 @@ let AppData = {
     ActiveCharacters: [],
     WolfTeam: [],
     VillagerTeam: [],
-    LivePlayers: []
+    LivePlayers: [],
+    WolfVotes: {},
+    KilledLastRound: []
   }
 }
 

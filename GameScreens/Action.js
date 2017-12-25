@@ -63,21 +63,54 @@ export class Action extends React.Component {
     }
     return -1;
   }
-  killPlayer(playerIdx, dataFunc) {
-    /*let appData = dataFunc();
-    appData.Game.LivePlayers.splice(playerIdx, 1)
-    dataFunc(appData)*/
+  getPlayerByName(playerName, playerList){
+    for (var i = 0; i < playerList.length; i++) {
+      const player = playerList[i];
+      if(player.name === playerName){
+        return player;
+      }
+    }
+    return -1;
   }
-  markPlayerForWolfAttack(playerIdx, dataFunc) {
-
+  killPlayer(playerIdx, dataFunc) {
+    let appData = dataFunc();
+    const deadPlayer = appData.Game.LivePlayers.splice(playerIdx, 1)
+    appData.Game.KilledLastRound.push({
+      player: deadPlayer[0],
+      killedBy: AppData.Game.ActivePlayer
+    })
+    dataFunc(appData)
+  }
+  markPlayerForWolfAttack(player, dataFunc) {
+    let appData = dataFunc();
+    let Vote = appData.Game.WolfVotes[player.name] || {
+      name: player.name,
+      count: 0
+    };
+    Vote.count++;
+    appData.Game.WolfVotes[player.name] = Vote;
+    dataFunc(appData)
   }
   getKilledByWolf(dataFunc) {
-
+    let appData = dataFunc();
+    const votes = appData.Game.WolfVotes;
+    let winningVote = null;
+    let maxVotes = 0;
+    for (var i = 0; i < votes.length; i++) {
+      const vote = votes[i];
+      if (vote.count > maxVotes){
+        maxVotes = vote.count;
+        winningVote = vote;
+      }
+    }
+    appData.Game.WolfVotes = {};
+    dataFunc(appData)
+    this.killPlayer(getPlayerIdxByName(winningVote.name, AppData.Characters[AppData.Game.LivePlayers), dataFunc);
   }
   next(dataFunc) {
     let appData = dataFunc();
     if(AppData.Characters[AppData.Game.LivePlayers[AppData.Game.ActivePlayer].characterId].kills && !AppData.Characters[AppData.Game.LivePlayers[AppData.Game.ActivePlayer].characterId].killsInstant){
-      this.markPlayerForWolfAttack(getPlayerIdxByName(this.state.item, AppData.Characters[AppData.Game.LivePlayers), dataFunc);
+      this.markPlayerForWolfAttack(getPlayerByName(this.state.item, AppData.Characters[AppData.Game.LivePlayers), dataFunc);
     }else if(AppData.Characters[AppData.Game.LivePlayers[AppData.Game.ActivePlayer].characterId].killsInstant){
       this.killPlayer(getPlayerIdxByName(this.state.item, AppData.Characters[AppData.Game.LivePlayers), dataFunc);
     }
