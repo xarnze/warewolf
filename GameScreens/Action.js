@@ -1,10 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableHighlight, Switch } from 'react-native';
+import { StyleSheet, Text, View, TouchableHighlight, Switch, Picker } from 'react-native';
 import { Header, Button, FormLabel, FormInput } from 'react-native-elements';
 import {
   DrawerNavigator,
 } from 'react-navigation';
-import SortableListView from 'react-native-sortable-listview'
 import { Outcome } from './Outcome';
 
 export class Action extends React.Component {
@@ -14,6 +13,8 @@ export class Action extends React.Component {
       // toggle box is closed initially
       show: false,
       disableKilling: false,
+      item: "Select Item",
+      isVisible: true,
     };
   }
   render() {
@@ -29,19 +30,29 @@ export class Action extends React.Component {
           <Text> You are {AppData.Characters[AppData.Game.LivePlayers[AppData.Game.ActivePlayer].characterId].name}</Text>
           <Text>{AppData.Characters[AppData.Game.LivePlayers[AppData.Game.ActivePlayer].characterId].description}</Text>
           <Text>{AppData.Characters[AppData.Game.LivePlayers[AppData.Game.ActivePlayer].characterId].helpText}</Text>
-          <View style={AppData.Characters[AppData.Game.LivePlayers[AppData.Game.ActivePlayer].characterId].kills ? styles.container : { display: 'none' }} >
-            <SortableListView
-              style={{ flex: 1, width: '100%' }}
-              disableSorting={true}
-              data={AppData.Game.LivePlayers}
-              renderRow={row => <RowComponent allowKill={!this.state.disableKilling} data={row} kill={ (name) => { this.state.disableKilling = true; this.killPlayer(name, dataFunc); this.setState(this.state);}} />}
-            />
+          <View style={AppData.Characters[AppData.Game.LivePlayers[AppData.Game.ActivePlayer].characterId].kills ? styles.listContainer : { display: 'none' }} >
+            <Picker
+              selectedValue={this.state.item}
+              onValueChange={(itemValue, itemIndex) => this.setState({item: itemValue})}>
+              {AppData.Game.LivePlayers.map(function(a) {
+                   return (
+                       <Picker.Item label={a.name} value={a.name}/>
+                   );
+               })}
+            </Picker>
           </View>
           <Button
             title='Next' onPress={ () => { this.next(dataFunc) } } />
         </View>
       </View>
     );
+  }
+  getPlayerList(playerList){
+    let players = [];
+    for (var i = playerList.length - 1; i >= 0; i--) {
+      players.push(playerList[i].name);
+    }
+    return players;
   }
   killPlayer(playerIdx, dataFunc) {
     /*let appData = dataFunc();
@@ -72,6 +83,7 @@ class RowComponent extends React.Component {
     };
   }
   render() {
+    console.log(this.props.allowKill)
     return (
       <TouchableHighlight
         underlayColor={'#eee'}
@@ -85,9 +97,9 @@ class RowComponent extends React.Component {
       >
         <View style={styles.container}>
           <Text>{this.props.data.name}</Text>
-          <View style={this.state.killed || this.props.allowKill ? { display: 'none' } : styles.container} >
+          <View style={(this.state.killed || !this.props.allowKill) ? { display: 'none' } : styles.container} >
             <Button
-                title='Kill' onPress={ () => { this.state.killed=true; this.setState(this.state); this.props.kill(this.props.data.name) } } />
+                title='Vote' onPress={ () => { this.state.killed=true; this.setState(this.state); this.props.kill(this.props.data.name) } } />
           </View>
           <View style={this.state.killed ? styles.container : { display: 'none' }} >
             <Text>Targeted</Text>
@@ -108,6 +120,9 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
+    paddingTop: 100,
+    paddingBottom: 100,
+    height: 'auto',
     backgroundColor: '#fff',
   }
 });
